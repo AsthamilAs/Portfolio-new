@@ -48,19 +48,26 @@ const loadingInterval = setInterval(() => {
 
 window.addEventListener("load", () => {
 
-    const loader = document.getElementById("preloader");
-
-    if (!loader) return;
+    if (!preloader) return;
 
     setTimeout(() => {
-        loader.classList.add("loaded");
+        preloader.classList.add("loaded");
     }, 1800);
 
 });
 
 
 /* =====================================================
+   DEVICE CHECK
+===================================================== */
+
+const isTouchDevice =
+    window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+
+/* =====================================================
    CUSTOM CURSOR
+   Desktop only
 ===================================================== */
 
 const cursor = document.querySelector(".cursor");
@@ -74,45 +81,50 @@ let followerX = 0;
 let followerY = 0;
 
 
-document.addEventListener("mousemove", (event) => {
+if (!isTouchDevice) {
 
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    document.addEventListener("mousemove", (event) => {
 
-    if (cursor) {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
 
-        cursor.style.transform =
-            `translate(${mouseX}px, ${mouseY}px)`;
+        if (cursor) {
+
+            cursor.style.transform =
+                `translate(${mouseX}px, ${mouseY}px)`;
+
+        }
+
+    });
+
+
+    function animateCursor() {
+
+        followerX +=
+            (mouseX - followerX) * 0.12;
+
+        followerY +=
+            (mouseY - followerY) * 0.12;
+
+        if (cursorFollower) {
+
+            cursorFollower.style.transform =
+                `translate(
+                    ${followerX - 16}px,
+                    ${followerY - 16}px
+                )`;
+
+        }
+
+        requestAnimationFrame(animateCursor);
 
     }
 
-});
-
-
-function animateCursor() {
-
-    followerX +=
-        (mouseX - followerX) * 0.12;
-
-    followerY +=
-        (mouseY - followerY) * 0.12;
 
     if (cursorFollower) {
-
-        cursorFollower.style.transform =
-            `translate(
-                ${followerX - 16}px,
-                ${followerY - 16}px
-            )`;
-
+        animateCursor();
     }
 
-    requestAnimationFrame(animateCursor);
-
-}
-
-if (cursorFollower) {
-    animateCursor();
 }
 
 
@@ -120,62 +132,67 @@ if (cursorFollower) {
    CURSOR HOVER
 ===================================================== */
 
-const interactiveElements = document.querySelectorAll(
-    "a, button, .project, .stack-card, .expertise-item"
-);
+if (!isTouchDevice) {
 
-interactiveElements.forEach((element) => {
+    const interactiveElements = document.querySelectorAll(
+        "a, button, .project, .stack-card, .expertise-item"
+    );
 
-    element.addEventListener("mouseenter", () => {
 
-        if (cursorFollower) {
+    interactiveElements.forEach((element) => {
 
-            cursorFollower.style.width = "55px";
-            cursorFollower.style.height = "55px";
+        element.addEventListener("mouseenter", () => {
 
-            cursorFollower.style.borderColor =
-                "rgba(184, 255, 61, 0.8)";
+            if (cursorFollower) {
 
-        }
+                cursorFollower.style.width = "55px";
+                cursorFollower.style.height = "55px";
 
-        if (cursor) {
+                cursorFollower.style.borderColor =
+                    "rgba(184, 255, 61, 0.8)";
 
-            cursor.style.transform =
-                `translate(
-                    ${mouseX}px,
-                    ${mouseY}px
-                ) scale(1.5)`;
+            }
 
-        }
+            if (cursor) {
+
+                cursor.style.transform =
+                    `translate(
+                        ${mouseX}px,
+                        ${mouseY}px
+                    ) scale(1.5)`;
+
+            }
+
+        });
+
+
+        element.addEventListener("mouseleave", () => {
+
+            if (cursorFollower) {
+
+                cursorFollower.style.width = "32px";
+                cursorFollower.style.height = "32px";
+
+                cursorFollower.style.borderColor =
+                    "rgba(184, 255, 61, 0.5)";
+
+            }
+
+            if (cursor) {
+
+                cursor.style.transform =
+                    `translate(
+                        ${mouseX}px,
+                        ${mouseY}px
+                    ) scale(1)`;
+
+            }
+
+        });
 
     });
 
-
-    element.addEventListener("mouseleave", () => {
-
-        if (cursorFollower) {
-
-            cursorFollower.style.width = "32px";
-            cursorFollower.style.height = "32px";
-
-            cursorFollower.style.borderColor =
-                "rgba(184, 255, 61, 0.5)";
-
-        }
-
-        if (cursor) {
-
-            cursor.style.transform =
-                `translate(
-                    ${mouseX}px,
-                    ${mouseY}px
-                ) scale(1)`;
-
-        }
-
-    });
-
-});
+}
 
 
 /* =====================================================
@@ -192,52 +209,66 @@ const heroGlowOne =
     document.querySelector(".hero-glow-1");
 
 
-document.addEventListener("mousemove", (event) => {
+/*
+   Desktop:
+   Mouse movement controls the background.
 
-    const x =
-        event.clientX / window.innerWidth - 0.5;
+   Mobile:
+   Background remains animated through CSS
+   without disabling the visual effects.
+*/
 
-    const y =
-        event.clientY / window.innerHeight - 0.5;
+if (!isTouchDevice) {
 
+    document.addEventListener("mousemove", (event) => {
 
-    if (heroOrb) {
+        const x =
+            event.clientX / window.innerWidth - 0.5;
 
-        heroOrb.style.transform =
-            `translate(
-                ${x * 35}px,
-                ${y * 35}px
-            )`;
-
-    }
-
-
-    if (heroGrid) {
-
-        heroGrid.style.transform =
-            `translate(
-                ${x * -12}px,
-                ${y * -12}px
-            )`;
-
-    }
+        const y =
+            event.clientY / window.innerHeight - 0.5;
 
 
-    if (heroGlowOne) {
+        if (heroOrb) {
 
-        heroGlowOne.style.transform =
-            `translate(
-                ${x * 60}px,
-                ${y * 60}px
-            )`;
+            heroOrb.style.transform =
+                `translate(
+                    ${x * 35}px,
+                    ${y * 35}px
+                )`;
 
-    }
+        }
 
-});
+
+        if (heroGrid) {
+
+            heroGrid.style.transform =
+                `translate(
+                    ${x * -12}px,
+                    ${y * -12}px
+                )`;
+
+        }
+
+
+        if (heroGlowOne) {
+
+            heroGlowOne.style.transform =
+                `translate(
+                    ${x * 60}px,
+                    ${y * 60}px
+                )`;
+
+        }
+
+    });
+
+}
 
 
 /* =====================================================
    SCROLL REVEAL
+   Works on Desktop + Mobile
 ===================================================== */
 
 const revealElements = document.querySelectorAll(
@@ -269,8 +300,8 @@ if ("IntersectionObserver" in window) {
 
             },
             {
-                threshold: 0.15,
-                rootMargin: "0px 0px -50px 0px"
+                threshold: 0.08,
+                rootMargin: "0px 0px -40px 0px"
             }
         );
 
@@ -296,51 +327,58 @@ if ("IntersectionObserver" in window) {
 
 /* =====================================================
    MAGNETIC BUTTONS
+   Desktop + Pointer Devices
 ===================================================== */
 
-const magneticButtons = document.querySelectorAll(
-    ".btn, .nav-cta, .contact-button"
-);
+if (!isTouchDevice) {
+
+    const magneticButtons = document.querySelectorAll(
+        ".btn, .nav-cta, .contact-button"
+    );
 
 
-magneticButtons.forEach((button) => {
+    magneticButtons.forEach((button) => {
 
-    button.addEventListener("mousemove", (event) => {
+        button.addEventListener("mousemove", (event) => {
 
-        const rect =
-            button.getBoundingClientRect();
+            const rect =
+                button.getBoundingClientRect();
 
-        const x =
-            event.clientX -
-            rect.left -
-            rect.width / 2;
+            const x =
+                event.clientX -
+                rect.left -
+                rect.width / 2;
 
-        const y =
-            event.clientY -
-            rect.top -
-            rect.height / 2;
+            const y =
+                event.clientY -
+                rect.top -
+                rect.height / 2;
 
-        button.style.transform =
-            `translate(
-                ${x * 0.12}px,
-                ${y * 0.12}px
-            )`;
+
+            button.style.transform =
+                `translate(
+                    ${x * 0.12}px,
+                    ${y * 0.12}px
+                )`;
+
+        });
+
+
+        button.addEventListener("mouseleave", () => {
+
+            button.style.transform =
+                "translate(0, 0)";
+
+        });
 
     });
 
-
-    button.addEventListener("mouseleave", () => {
-
-        button.style.transform =
-            "translate(0, 0)";
-
-    });
-
-});
+}
 
 
 /* =====================================================
    SMOOTH ANCHOR NAVIGATION
+   Desktop + Mobile
 ===================================================== */
 
 document
@@ -359,12 +397,15 @@ document
                 return;
             }
 
+
             const target =
                 document.querySelector(targetId);
 
             if (!target) return;
 
+
             event.preventDefault();
+
 
             target.scrollIntoView({
                 behavior: "smooth",
@@ -396,10 +437,12 @@ if (menuToggle && navigation) {
                 "mobile-active"
             );
 
+
         menuToggle.classList.toggle(
             "active",
             isOpen
         );
+
 
         menuToggle.setAttribute(
             "aria-expanded",
@@ -419,9 +462,11 @@ if (menuToggle && navigation) {
                     "mobile-active"
                 );
 
+
                 menuToggle.classList.remove(
                     "active"
                 );
+
 
                 menuToggle.setAttribute(
                     "aria-expanded",
@@ -437,27 +482,33 @@ if (menuToggle && navigation) {
 
 /* =====================================================
    HEADER SCROLL
+   Desktop + Mobile
 ===================================================== */
 
 const header =
     document.querySelector(".header");
 
 
-window.addEventListener("scroll", () => {
+window.addEventListener(
+    "scroll",
+    () => {
 
-    if (!header) return;
+        if (!header) return;
 
-    if (window.scrollY > 80) {
 
-        header.classList.add("scrolled");
+        if (window.scrollY > 80) {
 
-    } else {
+            header.classList.add("scrolled");
 
-        header.classList.remove("scrolled");
+        } else {
 
-    }
+            header.classList.remove("scrolled");
 
-}, { passive: true });
+        }
+
+    },
+    { passive: true }
+);
 
 
 /* =====================================================
@@ -470,49 +521,58 @@ const expertiseItems =
     );
 
 
-expertiseItems.forEach((item) => {
+if (!isTouchDevice) {
 
-    item.addEventListener("mousemove", (event) => {
+    expertiseItems.forEach((item) => {
 
-        const rect =
-            item.getBoundingClientRect();
+        item.addEventListener("mousemove", (event) => {
 
-        const x =
-            event.clientX -
-            rect.left -
-            rect.width / 2;
+            const rect =
+                item.getBoundingClientRect();
 
-        const y =
-            event.clientY -
-            rect.top -
-            rect.height / 2;
 
-        item.style.transform =
-            `translate(
-                ${x * 0.025}px,
-                ${y * 0.025}px
-            )`;
+            const x =
+                event.clientX -
+                rect.left -
+                rect.width / 2;
+
+
+            const y =
+                event.clientY -
+                rect.top -
+                rect.height / 2;
+
+
+            item.style.transform =
+                `translate(
+                    ${x * 0.025}px,
+                    ${y * 0.025}px
+                )`;
+
+        });
+
+
+        item.addEventListener("mouseleave", () => {
+
+            item.style.transform = "";
+
+        });
 
     });
 
-
-    item.addEventListener("mouseleave", () => {
-
-        item.style.transform = "";
-
-    });
-
-});
+}
 
 
 /* =====================================================
    ACTIVE NAVIGATION
+   Desktop + Mobile
 ===================================================== */
 
 const sections =
     document.querySelectorAll(
         "section[id]"
     );
+
 
 const navLinks =
     document.querySelectorAll(
@@ -530,12 +590,15 @@ if ("IntersectionObserver" in window) {
 
                     if (!entry.isIntersecting) return;
 
+
                     const currentId =
                         entry.target.getAttribute("id");
+
 
                     navLinks.forEach((link) => {
 
                         link.classList.remove("active");
+
 
                         if (
                             link.getAttribute("href") ===
@@ -567,6 +630,39 @@ if ("IntersectionObserver" in window) {
 
 
 /* =====================================================
+   MOBILE RESIZE SAFETY
+===================================================== */
+
+window.addEventListener("resize", () => {
+
+    if (!navigation || !menuToggle) return;
+
+    /*
+       If screen becomes desktop,
+       automatically close mobile menu.
+    */
+
+    if (window.innerWidth > 768) {
+
+        navigation.classList.remove(
+            "mobile-active"
+        );
+
+        menuToggle.classList.remove(
+            "active"
+        );
+
+        menuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+    }
+
+});
+
+
+/* =====================================================
    CONSOLE SIGNATURE
 ===================================================== */
 
@@ -576,6 +672,7 @@ console.log(
     "font-size:18px;font-weight:bold;" +
     "padding:8px 14px;"
 );
+
 
 console.log(
     "%c Full-Stack Developer Portfolio ",
